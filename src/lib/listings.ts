@@ -103,6 +103,7 @@ const browseInput = z.object({
   category: z
     .enum(["goods", "food", "help", "plants", "kids", "materials", "digital"])
     .nullable(),
+  q: z.string().max(80).nullable().optional(),
 });
 
 export const browseListings = createServerFn({ method: "GET" })
@@ -119,6 +120,7 @@ export const browseListings = createServerFn({ method: "GET" })
     `;
     const origin = { lat: data.lat, lng: data.lng };
     const nationwide = data.radiusMiles >= 2500;
+    const needle = (data.q ?? "").trim().toLowerCase();
     return rows
       .map((row) => mapListing(row, origin))
       .filter((listing) => {
@@ -127,6 +129,11 @@ export const browseListings = createServerFn({ method: "GET" })
         if (nationwide && miles > LOCAL_CUTOFF_MILES && !listing.nationalOk) return false;
         if (data.kind && listing.kind !== data.kind) return false;
         if (data.category && listing.category !== data.category) return false;
+        if (needle) {
+          const hay =
+            `${listing.title} ${listing.description} ${listing.city} ${listing.pickupPlace ?? ""}`.toLowerCase();
+          if (!hay.includes(needle)) return false;
+        }
         return true;
       })
       .sort((a, b) => (a.miles ?? 0) - (b.miles ?? 0));

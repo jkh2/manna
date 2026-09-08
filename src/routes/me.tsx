@@ -46,7 +46,7 @@ function MePage() {
       </p>
       <div className="mt-6">
         <Button asChild>
-          <Link to="/give">Pass something along</Link>
+          <Link to="/give">Give or ask</Link>
         </Button>
       </div>
 

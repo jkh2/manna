@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import { PlacePicker } from "@/components/place-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +15,7 @@ import {
   CATEGORIES,
   CATEGORY_LABEL,
   KINDS,
+  KIND_HINT,
   KIND_LABEL,
   type Category,
   type Fulfillment,
@@ -21,7 +23,16 @@ import {
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/give")({ component: GivePage });
+export const Route = createFileRoute("/give")({
+  component: GivePage,
+  validateSearch: (search: Record<string, unknown>): { kind?: Kind } => {
+    const kind = search.kind;
+    if (typeof kind === "string" && (KINDS as readonly string[]).includes(kind)) {
+      return { kind: kind as Kind };
+    }
+    return {};
+  },
+});
 
 type Handoff = "local" | "ship" | "remote";
 type LocalHow = "porch" | "public" | "pickup";
@@ -54,8 +65,9 @@ function GivePage() {
   const { user, isPending } = useCurrentUserState();
   const navigate = useNavigate();
   const { place } = usePlaceStore();
+  const { kind: presetKind } = Route.useSearch();
 
-  const [kind, setKind] = useState<Kind>("give");
+  const [kind, setKind] = useState<Kind>(presetKind ?? "give");
   const [category, setCategory] = useState<Category>("goods");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -117,16 +129,25 @@ function GivePage() {
   return (
     <main className="mx-auto max-w-xl px-4 py-12">
       <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-clay">
-        Pass along
+        Give or ask
       </p>
       <h1 className="mt-3 font-display text-4xl font-medium tracking-tight">
-        What is extra?
+        {kind === "ask"
+          ? "What do you need?"
+          : kind === "lend"
+            ? "What can they borrow?"
+            : kind === "offer"
+              ? "What can you do?"
+              : "What is extra?"}
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        Posted near {place.label}. Change your place on the home page if that is
-        not right. The item is free. You choose whether they pick it up, or
-        whether you cover postage if it ships.
+        The item is free. You choose how they receive it — local pickup, or
+        shipping with who covers postage.
       </p>
+
+      <div className="mt-6 rounded-xl bg-surface p-4 shadow-[var(--shadow-border)]">
+        <PlacePicker compact showRadius={false} />
+      </div>
 
       <form
         className="mt-8 space-y-6"
@@ -140,7 +161,7 @@ function GivePage() {
         }}
       >
         <fieldset>
-          <legend className="mb-2 text-sm font-medium">Kind</legend>
+          <legend className="mb-2 text-sm font-medium">This is</legend>
           <div className="flex flex-wrap gap-2">
             {KINDS.map((item) => (
               <Chip key={item} active={kind === item} onClick={() => setKind(item)}>
@@ -148,6 +169,7 @@ function GivePage() {
               </Chip>
             ))}
           </div>
+          <p className="mt-2 text-xs leading-relaxed text-muted">{KIND_HINT[kind]}</p>
         </fieldset>
 
         <fieldset>
@@ -230,7 +252,9 @@ function GivePage() {
           {handoff === "local" && (
             <div className="space-y-4">
               <label className="block space-y-2">
-                <span className="text-sm font-medium">Pickup location</span>
+                <span className="text-sm font-medium">
+                  {kind === "ask" ? "Where you can pick it up" : "Pickup location"}
+                </span>
                 <Input
                   required
                   minLength={3}
@@ -326,7 +350,7 @@ function GivePage() {
         </div>
 
         <Button type="submit" className="w-full" disabled={mutation.isPending || photoBusy}>
-          {mutation.isPending ? "Posting…" : "Set it out"}
+          {mutation.isPending ? "Posting…" : kind === "ask" ? "Post this need" : "Put it on the porch"}
         </Button>
       </form>
     </main>

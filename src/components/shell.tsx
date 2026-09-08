@@ -31,7 +31,7 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               <Plus className="size-4" />
               <span className="sm:hidden">Give</span>
-              <span className="hidden sm:inline">Pass along</span>
+              <span className="hidden sm:inline">Give or ask</span>
             </Link>
             <AuthSlot />
           </nav>
@@ -54,7 +54,7 @@ export function Shell({ children }: { children: ReactNode }) {
               Covenant
             </Link>
             <Link to="/give" className="hover:text-ink">
-              Pass along
+              Give or ask
             </Link>
           </div>
         </div>

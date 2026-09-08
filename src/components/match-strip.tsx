@@ -15,7 +15,7 @@ export function MatchStrip({ matches }: { matches: MatchPair[] }) {
   return (
     <section className="rounded-xl bg-surface p-5 shadow-[var(--shadow-border)]">
       <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-clay">
-        Someone asked. Someone has extra.
+        Someone needs something. Someone has extra.
       </p>
       <h2 className="mt-2 font-display text-2xl font-medium tracking-tight">
         Matched nearby
@@ -34,7 +34,7 @@ export function MatchStrip({ matches }: { matches: MatchPair[] }) {
               params={{ id: match.askId }}
               className="min-w-0 hover:text-clay"
             >
-              <p className="text-[10px] uppercase tracking-wider text-faint">Ask</p>
+              <p className="text-[10px] uppercase tracking-wider text-faint">Need</p>
               <p className="truncate font-medium">{match.askTitle}</p>
             </Link>
             <p className="hidden text-center text-xs text-faint sm:block">{match.reason}</p>
@@ -43,7 +43,7 @@ export function MatchStrip({ matches }: { matches: MatchPair[] }) {
               params={{ id: match.offerId }}
               className="min-w-0 text-left hover:text-clay sm:text-right"
             >
-              <p className="text-[10px] uppercase tracking-wider text-faint">Give</p>
+              <p className="text-[10px] uppercase tracking-wider text-faint">Extra</p>
               <p className="truncate font-medium">{match.offerTitle}</p>
             </Link>
           </li>

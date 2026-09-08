@@ -58,10 +58,17 @@ export type Interest = {
 };
 
 export const KIND_LABEL: Record<Kind, string> = {
-  give: "Give",
-  lend: "Lend",
-  offer: "Offer",
-  ask: "Ask",
+  give: "Extra",
+  lend: "Borrow",
+  offer: "Time",
+  ask: "Need",
+};
+
+export const KIND_HINT: Record<Kind, string> = {
+  give: "They keep it. No money changes hands.",
+  lend: "They borrow it and bring it back.",
+  offer: "Your time, a ride, a skill.",
+  ask: "What you’re hoping a neighbor has extra.",
 };
 
 export const CATEGORY_LABEL: Record<Category, string> = {

@@ -99,6 +99,40 @@ function ListingPage() {
       <p className="mt-3 text-sm text-muted">
         {listing.giverName} · {listing.city}, {listing.region} · {timeAgo(listing.createdAt)}
       </p>
+
+      <div className="mt-5 rounded-xl bg-surface p-5 shadow-[var(--shadow-border)]">
+        <p className="text-xs uppercase tracking-wider text-faint">How to get this</p>
+        <p className="mt-1 text-base font-medium">
+          {listing.fulfillment === "ship_prepaid"
+            ? "Shipping is free"
+            : listing.fulfillment === "ship"
+              ? "You cover postage"
+              : isLocalPickup(listing.fulfillment)
+                ? "Local pickup"
+                : FULFILLMENT_LABEL[listing.fulfillment]}
+        </p>
+        {listing.fulfillment === "ship_prepaid" && (
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            The giver will mail it and pay the post office. The gift itself is free.
+          </p>
+        )}
+        {listing.fulfillment === "ship" && (
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            They will ship. You pay postage — not for the item.
+          </p>
+        )}
+        {isLocalPickup(listing.fulfillment) && (
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            {listing.pickupPlace
+              ? listing.pickupPlace
+              : FULFILLMENT_LABEL[listing.fulfillment]}
+          </p>
+        )}
+        {listing.nationalOk && isShipped(listing.fulfillment) && (
+          <p className="mt-1 text-xs text-faint">Can travel anywhere in the US.</p>
+        )}
+      </div>
+
       {listing.photoUrl && (
         <img
           src={listing.photoUrl}
@@ -109,31 +143,14 @@ function ListingPage() {
       <p className="mt-6 text-base leading-relaxed text-ink">{listing.description}</p>
       <dl className="mt-8 grid gap-4 rounded-xl bg-surface p-5 shadow-[var(--shadow-border)] sm:grid-cols-2">
         <div>
-          <dt className="text-xs uppercase tracking-wider text-faint">How</dt>
+          <dt className="text-xs uppercase tracking-wider text-faint">Meet</dt>
           <dd className="mt-1 text-sm font-medium">
-            {listing.fulfillment === "ship_prepaid"
-              ? "Shipping is free"
-              : listing.fulfillment === "ship"
-                ? "You cover postage"
-                : isLocalPickup(listing.fulfillment)
-                  ? "Local pickup"
-                  : FULFILLMENT_LABEL[listing.fulfillment]}
+            {isLocalPickup(listing.fulfillment)
+              ? FULFILLMENT_LABEL[listing.fulfillment]
+              : listing.fulfillment === "remote"
+                ? "Remote — no porch needed"
+                : "Ships"}
           </dd>
-          {listing.fulfillment === "ship_prepaid" && (
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              The giver will mail it and pay the post office. The gift itself is free.
-            </p>
-          )}
-          {listing.fulfillment === "ship" && (
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              They will ship. You pay postage — not for the item.
-            </p>
-          )}
-          {isLocalPickup(listing.fulfillment) && (
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              {FULFILLMENT_LABEL[listing.fulfillment]}
-            </p>
-          )}
         </div>
         {listing.pickupPlace && (
           <div>
@@ -200,15 +217,17 @@ function ListingPage() {
           ) : (
             <>
               <SignedOut>
-                <p className="text-sm text-muted">Sign in to say you can use this.</p>
+                <p className="text-sm text-muted">
+                  Sign in to ask for this. The giver chooses who receives it — it is not first-come.
+                </p>
                 <Button asChild className="mt-3">
-                  <Link to="/login">Sign in</Link>
+                  <Link to="/login">Sign in to ask</Link>
                 </Button>
               </SignedOut>
               <SignedIn>
                 {mineQuery.data ? (
                   <p className="rounded-lg bg-sunken px-4 py-3 text-sm text-ink">
-                    You are in line. The giver chooses — they will see you asked.
+                    You’re in line. The giver chooses — they will see you asked.
                   </p>
                 ) : (
                   <InterestForm listingId={id} kind={listing.kind} />
@@ -292,6 +311,12 @@ function InterestForm({
       : kind === "lend"
         ? "I will borrow this and bring it back."
         : "I can use this, with thanks.";
+  const action =
+    kind === "ask"
+      ? "I can help"
+      : kind === "lend"
+        ? "I’d like to borrow this"
+        : "I’d like this";
 
   return (
     <form
@@ -301,6 +326,9 @@ function InterestForm({
         mutation.mutate();
       }}
     >
+      <p className="text-sm text-muted">
+        The giver chooses who receives this. It is not first-come.
+      </p>
       <label className="block text-sm font-medium">A short note</label>
       <Textarea
         value={note}
@@ -309,7 +337,7 @@ function InterestForm({
         maxLength={400}
       />
       <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? "Sending…" : "I can use this"}
+        {mutation.isPending ? "Sending…" : action}
       </Button>
     </form>
   );

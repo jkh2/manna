@@ -1,3 +1,5 @@
+import { milesBetween } from "@/lib/geo";
+
 export type Place = {
   label: string;
   city: string;
@@ -33,4 +35,17 @@ export const PLACES: Place[] = [
   { label: "Minneapolis, MN", city: "Minneapolis", region: "MN", lat: 44.9778, lng: -93.265 },
 ];
 
-export const DEFAULT_PLACE = PLACES[0];
+export const DEFAULT_PLACE = PLACES[0]!;
+
+export function nearestPlace(lat: number, lng: number): Place {
+  let best = DEFAULT_PLACE;
+  let bestMiles = Number.POSITIVE_INFINITY;
+  for (const place of PLACES) {
+    const miles = milesBetween(place, { lat, lng });
+    if (miles < bestMiles) {
+      best = place;
+      bestMiles = miles;
+    }
+  }
+  return best;
+}

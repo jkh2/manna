@@ -69,7 +69,7 @@ function AboutPage() {
 
       <div className="mt-10 flex flex-wrap gap-3">
         <Button asChild>
-          <Link to="/give">Pass something along</Link>
+          <Link to="/give">Give or ask</Link>
         </Button>
         <Button asChild variant="outline">
           <Link to="/">See what is near</Link>

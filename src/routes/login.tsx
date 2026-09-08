@@ -47,8 +47,8 @@ function Login() {
           Come in.
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Sign in to pass something along, or to say you can use what a neighbor
-          offered. Looking stays free, always.
+          Sign in to give or ask, or to say you’d like what a neighbor set out.
+          Looking stays free, always.
         </p>
 
         {authEnabled ? (

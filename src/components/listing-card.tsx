@@ -5,7 +5,6 @@ import { timeAgo } from "@/lib/format";
 import {
   CATEGORY_LABEL,
   handoffSummary,
-  isShipped,
   KIND_LABEL,
   type Listing,
 } from "@/lib/types";
@@ -61,12 +60,14 @@ export function ListingCard({ listing }: { listing: Listing }) {
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">
           {listing.description}
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
+        {!postageTone && (
+          <p className="mt-3 text-sm font-medium text-ink">{handoffSummary(listing)}</p>
+        )}
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
           <span>
             {listing.city}, {listing.region}
           </span>
           {listing.miles != null && <span>{formatMiles(listing.miles)}</span>}
-          {!isShipped(listing.fulfillment) && <span>{handoffSummary(listing)}</span>}
           <span>{timeAgo(listing.createdAt)}</span>
         </div>
       </div>
